@@ -317,7 +317,7 @@ class WP_Resume_Admin {
     function location_box( $post ) {
         //pull the current values where applicable
         $from = get_post_meta( $post->ID, 'wp_resume_location', true );
-        $this->parent->template->date_box( 'location' );
+        $this->parent->template->location_box( 'location' );
     }
 
 
