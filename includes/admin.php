@@ -198,6 +198,9 @@ class WP_Resume_Admin {
 		//build the date meta input box
 		add_meta_box( 'dates', __('Date', 'wp-resume'), array( &$this, 'date_box' ), 'wp_resume_position', 'normal', 'high');
 
+		//build the date meta input box
+        add_meta_box( 'location', __('Location', 'wp-resume'), array( &$this, 'location_box' ), 'wp_resume_position', 'normal', 'high');
+
 		//build custom order box w/ helptext
 		add_meta_box( 'pageparentdiv', __('Resume Order', 'wp-resume'), array( &$this, 'order_box' ), 'wp_resume_position', 'side', 'low');
 
@@ -305,6 +308,17 @@ class WP_Resume_Admin {
 		$this->parent->template->date_box( compact( 'from', 'to' ) );
 
 	}
+
+    /**
+     * Generates our location custom metadata box
+     * @since 2.5a
+     * @params object $post the post object WP passes
+     */
+    function location_box( $post ) {
+        //pull the current values where applicable
+        $from = get_post_meta( $post->ID, 'wp_resume_location', true );
+        $this->parent->template->date_box( 'location' );
+    }
 
 
 	/**
