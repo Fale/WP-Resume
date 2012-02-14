@@ -42,16 +42,27 @@ class WP_Resume_Admin {
 		add_action( 'create_wp_resume_organization', array( &$this, 'save_link_field' ) );
 		add_action( 'edited_wp_resume_organization', array( &$this, 'save_link_field' ) );
 		
-		//Qtranslate support
-		if ( function_exists( 'qtrans_modifyTermFormFor' ) ) {
-			add_action( 'wp_resume_section_add_form', 'qtrans_modifyTermFormFor' );
-			add_action( 'wp_resume_section_edit_form', 'qtrans_modifyTermFormFor' );
-			add_action( 'wp_resume_organization_add_form', 'qtrans_modifyTermFormFor' );
-			add_action( 'wp_resume_organization_edit_form', 'qtrans_modifyTermFormFor' );
-		}
+		//i18n support
+		add_action( 'plugins_loaded', array( &$this, 'i18n_init' ) );
 		
 		$this->init_caps();
 			
+	}
+	
+	/**
+	 * Delay i18ning until all plugins have a chance to load
+	 * Adds qTranslate support for translating sections, organizations, etc.
+	 */
+	function i18n_init() {
+		
+		if ( !function_exists( 'qtrans_modifyTermFormFor' ) )
+			return;
+			
+		add_action( 'wp_resume_section_add_form', 'qtrans_modifyTermFormFor' );
+		add_action( 'wp_resume_section_edit_form', 'qtrans_modifyTermFormFor' );
+		add_action( 'wp_resume_organization_add_form', 'qtrans_modifyTermFormFor' );
+		add_action( 'wp_resume_organization_edit_form', 'qtrans_modifyTermFormFor' );
+		
 	}
 	
 	/**
@@ -351,8 +362,8 @@ class WP_Resume_Admin {
 		wp_set_object_terms( $post_id, (int) $_POST['wp_resume_organization'], 'wp_resume_organization' );
 
 		//update the posts date meta
-		update_post_meta( $post_id, 'wp_resume_from', $_POST['from'] );
-		update_post_meta( $post_id, 'wp_resume_to', $_POST['to'] );
+		update_post_meta( $post_id, 'wp_resume_from', wp_nohtml_kses( $_POST['from'] ) );
+		update_post_meta( $post_id, 'wp_resume_to', wp_nohtml_kses( $_POST['to'] ) );
 
 		//If they did not set a menu order, calculate a best guess bassed off of chronology
 		//(menu order uses the posts's menu_order field and is 1 bassed by default)
