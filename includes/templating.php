@@ -35,7 +35,7 @@ class WP_Resume_Templating {
 		$this->future_signifier = __( ' (Anticipated)', 'wp-resume' );
 
 		if ( defined('QTRANS_INIT') || $this->parent->api->apply_filters( 'translate_date', false ) )
-			add_filter( 'resume_date', array( &$this, 'translate_date' ), 10, 4 );
+			add_filter( 'wp_resume_date', array( &$this, 'translate_date' ), 10, 2 );
 
 	}
 
@@ -239,7 +239,7 @@ class WP_Resume_Templating {
 			return $date;
 
 		//i18n date
-		$date = date_i18n( $date_format, strtotime( $from ) );
+		$date = date_i18n( $date_format, strtotime( $date ) );
 
 		//we don't do anything else to start dates, so kick
 		if ( $type == 'from' )
@@ -251,7 +251,7 @@ class WP_Resume_Templating {
 
 		//append e.g, ' (Anticipated)' to future dates
 		//note: this string won't appear in .POT files, but should still hit qTranslate when run (I hope)
-		$date .= __( $this->parent->api->filters( 'future_signifier', $this->future_signifier ) );
+		$date .= __( $this->parent->api->apply_filters( 'future_signifier', $this->future_signifier ) );
 
 		return $date;
 
