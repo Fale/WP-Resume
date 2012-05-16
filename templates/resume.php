@@ -18,11 +18,11 @@ $template = &$resume->templating;
 $options = $resume->options->get_options();
 
 ?>
-		<div class="hresume">
+		<div class="hresume" itemscope itemtype="http://schema.org/Person">
 			<div id="bar"> </div>
 			<header class="vcard">
-				<h2 class="fn n url" id="name">
-					<a href="<?php get_permalink(); ?>">
+				<h2 class="fn n url" id="name" itemprop="name">
+					<a href="<?php echo get_permalink(); ?>" itemprop="url">
 						<?php echo $template->get_name(); ?>
 					</a>
 				</h2>
@@ -34,15 +34,15 @@ $options = $resume->options->get_options();
 						<?php 
 							//per hCard specs (http://microformats.org/profile/hcard) adr needs to be an array
 							if ( is_array( $value ) ) { ?>
-							<div id="<?php echo $field; ?>">
+							<div id="<?php echo $field; ?>" <?php $template->contact_info_itemprop( $field ); ?>>
 								<?php foreach ($value as $subfield => $subvalue) { ?>
-									<li class="<?php echo $subfield; ?>"><?php echo $subvalue; ?></li>
+									<li class="<?php echo $subfield; ?>" <?php $template->contact_info_itemprop( $subfield ); ?>><?php echo $subvalue; ?></li>
 								<?php } ?>
 							</div>
 						<?php } elseif ($field == 'email') { ?>
-							<li><a href="mailto:<?php echo $value; ?>" class="<?php echo $field; ?>"><?php echo $value; ?></a></li>
+							<li><a href="mailto:<?php echo $value; ?>" class="<?php echo $field; ?>" <?php $template->contact_info_itemprop( $field ); ?>><?php echo $value; ?></a></li>
 						<?php } else { ?>
-							<li class="<?php echo $field; ?>"><?php echo $value; ?></li>
+							<li class="<?php echo $field; ?>" <?php $template->contact_info_itemprop( $field ); ?>><?php echo $value; ?></li>
 						<?php } ?>
 					<?php } ?>
 				<?php } ?>
@@ -79,10 +79,10 @@ $options = $resume->options->get_options();
 					// If this is the first organization, 
 					// or if this org. is different from the previous, begin new org
 					if ( $org && $resume->get_previous_org() != $org) { ?>
-				<article class="organization <?php echo $section->slug; ?> vevent" id="<?php echo $org->slug; ?>">
+				<article itemprop="affiliation"<?php if ( $section->slug == 'education' ) echo ' itemprop="alumniOf"'; ?> itemscope itemtype="http://schema.org/<?php if ( $section->slug == 'education' ) echo 'Educational'; ?>Organization" class="organization <?php echo $section->slug; ?> vevent" id="<?php echo $org->slug; ?>">
 					<header>
-						<div class="orgName summary" id="<?php echo $org->slug; ?>-name"><?php echo $template->get_organization_name( $org ); ?></div>
-						<div class="location"><?php echo $org->description; ?></div>
+						<div class="orgName summary" itemprop="name" id="<?php echo $org->slug; ?>-name"><?php echo $template->get_organization_name( $org ); ?></div>
+						<div class="location" itemprop="location" itemprop="workLocation"><?php echo $org->description; ?></div>
 					</header>
 <?php 			} 	//End if new org ?>
 					<<?php echo ( $org ) ? 'section' : 'article'; ?> class="vcard">
@@ -92,12 +92,12 @@ $options = $resume->options->get_options();
 						<?php } else { ?>
 							<header>
 						<?php } ?>
-						<div class="title"><?php echo $template->get_title( get_the_ID() ); ?></div>
+						<div class="title" itemprop="jobTitle"><?php echo $template->get_title( get_the_ID() ); ?></div>
 						<div class="date"><?php echo $template->get_date( get_the_ID() ); ?></div>
 						<?php if ( !$org ) { ?>
 							</header>
 						<?php } ?>
-						<div class="details">
+						<div class="details" itemprop="description">
 						<?php the_content(); ?>
 <?php 			//If the current user can edit posts, output the link
 				if ( current_user_can( 'edit_posts' ) ) 

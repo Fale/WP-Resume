@@ -58,16 +58,24 @@ class WP_Resume_Templating {
 	/**
 	 * Returns the title of the postition, or if rewriting is enabled, a link to the position
 	 * @param int $ID the position ID
+	 * @pararm bool $link (optional) whether to wrap title in link or not
 	 * @return string the title, or the title link
 	 */
-	function get_title( $ID ) {
+	function get_title( $ID, $link = true ) {
 
-		if ( !$this->parent->options->get_option( 'rewrite' ) ) {
+		//rewriting is disabled globally, or linking explicitly disabled via 2nd argument
+		// return just the text of the title
+		if ( !$link || !$this->parent->options->get_option( 'rewrite' ) ) {
+		
 			$title = get_the_title();
+		
+		//return the title wrapped in a link to the position's permalink
 		} else {
-            $title = '<a title="' . get_the_title() . '" href="' . get_permalink() . '">' . get_the_title() . '</a>';
+		
+			$title = '<a title="' . get_the_title() . '" href="' . get_permalink() . '">' . get_the_title() . '</a>';
 			$title = $this->parent->api->apply_deprecated_filters( 'resume_title_link', '2.5', 'title_link', $title );
 			$title = $this->parent->api->apply_filters( 'title_link', $title );
+		
 		}
 
 		$title = $this->parent->api->apply_deprecated_filters( 'resume_position_title', '2.5', 'position_title', $title );
@@ -133,7 +141,7 @@ class WP_Resume_Templating {
 			return $this->parent->api->apply_filters( "{$taxonomy}_name", $name );
 		}
 
-        $title = '<a title="' . $object->name . '" target="_new" href="' . $link . '">' . $object->name . '</a>';
+        $title = '<a title="' . $object->name . '" itemprop="url" target="_new" href="' . $link . '">' . $object->name . '</a>';
 
 		$title = $this->parent->api->apply_deprecated_filters( "resume_{$taxonomy}_link", '2.5', "{$taxonomy}_link", $title );
 		$title = $this->parent->api->apply_filters( '{$taxonomy}_link', $title );
@@ -191,6 +199,7 @@ class WP_Resume_Templating {
 		foreach( array( 'from' => 'dtstart', 'to' => 'dtend' ) as $field => $class ) {
 			
 			$value = get_post_meta( $ID, "wp_resume_{$field}", true );
+			$itemprop = ( $class = 'dtstart' ) ? 'startDate' : 'endDate';
 
 			//we don't have this field, skip
 			if ( !$value)
@@ -201,19 +210,19 @@ class WP_Resume_Templating {
 			
 			//if we can parse the date, append the proper class and formatted date to span
 			if ( strtotime( $value ) ) 
-				$date .= '<span class="' . $class . '" title="' . date( 'Y-m-d', strtotime( $value ) ). '">';
+				$date .= '<time itemprop="' . $itemprop . '" class="' . $class . '" datetime="' . date( 'Y-m-d', strtotime( $value ) ) . '" title="' . date( 'Y-m-d', strtotime( $value ) ) . '">';
 			
 			//if the position is current, append todays date to span
 			else if ( $value == 'Present' )
-				$date .= '<span title="' . date( 'Y-m-d' ) . '">';
+				$date .= '<time datetime="' . date( 'Y-m-d' ) . ' title="' . date( 'Y-m-d' ) . '">';
 				
 			//if we can't parse the date, just output a standard span
 			else
-				$date .= '<span>';
+				$date .= '<time>';
 	
 			$date .= $this->parent->api->apply_filters( 'date', $value, $field );
 			
-			$date .= '</span>';		
+			$date .= '</time>';		
 			
 			//this is the from field and there is a to field, append the dash
 			//it's okay that we're calling get_post_meta twice on "to" because it's cached automatically
@@ -269,6 +278,39 @@ class WP_Resume_Templating {
 
 		return $date;
 
+	}
+	
+	/**
+	 * Translates hresume field names to author/postalAddress microformat fields
+	 * @param string $field the hresume field
+	 * @return string the schema.org compliant field
+	 */
+	function get_contact_info_itemprop( $field ) {
+		
+		$trans = array( 
+			'tel'            => 'itemprop="telephone"',
+			'email'          => 'itemprop="email"',
+			'adr'            => 'itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"',
+			'street-address' => 'itemprop="streetAddress"',
+			'locality'       => 'itemprop="addressLocality"',
+			'region'         => 'itemprop="addressRegion"',
+			'postal-code'    => 'itemprop="postalCode"',
+			'country-name'   => 'itemprop="addressCountry"',
+		);
+		
+		if ( !array_key_exists( $field, $trans ) )
+			return;
+			
+		return $trans[ $field ];
+		
+	}
+	
+	/**
+	 * Retrieves and echos contact info itemprop property
+	 * @param string $field the hresume field	 
+	 */
+	function contact_info_itemprop( $field ) {
+		echo $this->get_contact_info_itemprop( $field );
 	}
 
 
