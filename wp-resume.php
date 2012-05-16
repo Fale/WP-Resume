@@ -159,7 +159,7 @@ class WP_Resume extends Plugin_Boilerplate_v_1 {
 			'menu_position'        => null,
 			'register_meta_box_cb' => array( &$this->admin, 'meta_callback' ),
 			'supports'             => array( 'title', 'editor', 'revisions', 'custom-fields', 'page-attributes', 'author'),
-			'taxonomies'           => array('wp_resume_section', 'wp_resume_organization'),
+			'taxonomies'           => array('wp_resume_section', 'wp_resume_organization', 'wp_resume_topic'),
 		);
 
 		$args = $this->api->apply_filters( 'cpt', $args );
@@ -197,6 +197,34 @@ class WP_Resume extends Plugin_Boilerplate_v_1 {
 
 		//Register section taxonomy
 		register_taxonomy( 'wp_resume_section', 'wp_resume_position', $args );
+		
+		$labels = array(
+			'name'              => _x( 'Topics', 'taxonomy general name', 'wp-resume' ),
+			'singular_name'     => _x( 'Topic', 'taxonomy singular name', 'wp-resume' ),
+			'search_items'      => __( 'Search Topics', 'wp-resume' ),
+			'all_items'         => __( 'All Topics', 'wp-resume' ),
+			'parent_item'       => __( 'Parent Topic', 'wp-resume' ),
+			'parent_item_colon' => __( 'Parent Topics:', 'wp-resume' ),
+			'edit_item'         => __( 'Edit Topic', 'wp-resume' ),
+			'update_item'       => __( 'Update Topic', 'wp-resume' ),
+			'add_new_item'      => __( 'Add New Topic', 'wp-resume' ),
+			'new_item_name'     => __( 'New Topic Name', 'wp-resume' ),
+		);
+
+		$args = $this->api->apply_filters( 'topic_ct', array( 
+			'hierarchical' => true, 
+			'labels' => $labels,  
+			'query_var' => true, 
+			'rewrite' => ( $rewrite ) ? array( 'slug' => 'topics' ) : false, 
+			'capabilities' => array( 
+				'manage_terms'  => 'manage_resume_topics',
+				'edit_terms'    => 'edit_resume_topics',
+				'delete_terms'  => 'delete_resume_topics',
+				'assign_terms ' => 'assign_resume_topics',
+				),
+			) 
+		);
+		register_taxonomy( 'wp_resume_topic', 'wp_resume_position', $args );
 
 		//orgs labels array
 		$labels = array(
