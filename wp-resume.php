@@ -383,6 +383,63 @@ class WP_Resume extends Plugin_Boilerplate_v_1 {
 
 
 	/**
+	 * Retrieves the topics associated with a given position
+	 * @since 2.5.3
+	 */
+	function get_topic( $postID ) {
+
+		if ( $cache = $this->cache->get( $postID . '_topic' ) )
+			return $cache;
+
+		$organization = wp_get_object_terms( $postID, 'wp_resume_topic' );
+
+		if ( is_wp_error( $organization ) || !isset( $organization[0] ) )
+			return false;
+
+		$org = $this->api->apply_deprecated_filters( 'resume_topic', '2.5', 'topic', $organization[0] );
+		$org = $this->api->apply_filters( 'topics', $organization[0] );
+
+		$this->cache->set( $postID . '_topic', $org );
+
+		return $org;
+
+	}
+
+
+	/**
+	 * Retrieves an organization's link, if any
+	 * @param int $org the org ID
+	 * @return string the org link
+	 */
+	function get_topic_link( $org ) {
+
+		$slug = 'wp_resume_topic_link_' . (int) $org;
+		$link = $this->cache->get( $slug );
+
+		if ( !$link ) {
+			$link = get_option( $slug );
+			$this->cache->set( $slug, $link );
+		}
+
+		$link = $this->api->apply_filters( 'topic_link', $link, $org );
+
+		return $link;
+	}
+
+
+	/**
+	 * Stores an organization's link
+	 * @param int $org the org ID
+	 * @return bool success/fail
+	 */
+	function set_topic_link( $org, $link ) {
+		$slug = 'wp_resume_topic_link_' . (int) $org;
+		$this->cache->set( $slug, $link );
+		return update_option( $slug, esc_url( $link ) );
+	}
+
+
+	/**
 	 * Retrieves the org associated with a given position
 	 * @since 1.1a
 	 */
