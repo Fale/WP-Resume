@@ -30,6 +30,7 @@ class WP_Resume_Admin {
 
 		//ajax callbacks
 		add_action('wp_ajax_add_wp_resume_section', array( &$this, 'ajax_add') );
+		add_action('wp_ajax_add_wp_resume_topic', array( &$this, 'ajax_add') );
 		add_action('wp_ajax_add_wp_resume_organization', array( &$this, 'ajax_add') );
 		add_action('wp_ajax_wp_resume_hide_donate', array( &$this, 'hide_donate') );
 
@@ -62,7 +63,8 @@ class WP_Resume_Admin {
 		add_action( 'wp_resume_section_edit_form', 'qtrans_modifyTermFormFor' );
 		add_action( 'wp_resume_organization_add_form', 'qtrans_modifyTermFormFor' );
 		add_action( 'wp_resume_organization_edit_form', 'qtrans_modifyTermFormFor' );
-		
+		add_action( 'wp_resume_topic_add_form', 'qtrans_modifyTermFormFor' );
+		add_action( 'wp_resume_topic_edit_form', 'qtrans_modifyTermFormFor' );
 	}
 	
 	/**
@@ -86,12 +88,16 @@ class WP_Resume_Admin {
 				'delete_published_resume_positions' => true,
 				'publish_resume_positions'          => true,
 				'manage_resume_sections'            => true,
+				'manage_resume_topics'	            => true,
 				'manage_resume_organizations'       => true,
 				'edit_resume_sections'              => true,
+				'edit_resume_topics'	           	=> true,
 				'edit_resume_organizations'         => true,
 				'delete_resume_sections'            => true,
+				'delete_resume_topics'            	=> true,
 				'delete_resume_organizations'       => true,
 				'assign_resume_sections'            => true,
+				'assign_resume_topics'            	=> true,
 				'assign_resume_organizations'       => true,
 				),
 			'editor' => array( 
@@ -109,12 +115,15 @@ class WP_Resume_Admin {
 				'delete_published_resume_positions' => true,
 				'publish_resume_positions'          => true,
 				'manage_resume_sections'            => true,
+				'manage_resume_topics'	            => true,
 				'manage_resume_organizations'       => true,
-				'edit_resume_sections'              => true,
+				'edit_resume_topics' 	            => true,
 				'edit_resume_organizations'         => true,
 				'delete_resume_sections'            => true,
+				'delete_resume_topics'            	=> true,
 				'delete_resume_organizations'       => true,
 				'assign_resume_sections'            => true,
+				'assign_resume_topics'            	=> true,
 				'assign_resume_organizations'       => true,
 				),
 			'author' => array( 
@@ -132,12 +141,16 @@ class WP_Resume_Admin {
 				'delete_published_resume_positions' => true,
 				'publish_resume_positions'          => true,
 				'manage_resume_sections'            => true,
+				'manage_resume_topics'            	=> true,
 				'manage_resume_organizations'       => true,
 				'edit_resume_sections'              => true,
+				'edit_resume_topics'              	=> true,
 				'edit_resume_organizations'         => true,
 				'delete_resume_sections'            => false,
+				'delete_resume_topics'            	=> false,
 				'delete_resume_organizations'       => false,
 				'assign_resume_sections'            => true,
+				'assign_resume_topics'            	=> true,
 				'assign_resume_organizations'       => true,
 				),
 			'contributor' => array( 
@@ -155,12 +168,16 @@ class WP_Resume_Admin {
 				'delete_published_resume_positions' => false,
 				'publish_resume_positions'          => false,
 				'manage_resume_sections'            => true,
+				'manage_resume_topics'            	=> true,
 				'manage_resume_organizations'       => true,
 				'edit_resume_sections'              => true,
+				'edit_resume_topics'              	=> true,
 				'edit_resume_organizations'         => true,
 				'delete_resume_sections'            => false,
+				'delete_resume_topics'            	=> false,
 				'delete_resume_organizations'       => false,
 				'assign_resume_sections'            => true,
+				'assign_resume_topics'	            => true,
 				'assign_resume_organizations'       => true,
 				),
 			'subscriber' => array( 
@@ -178,12 +195,16 @@ class WP_Resume_Admin {
 				'delete_published_resume_positions' => false,
 				'publish_resume_positions'          => false,
 				'manage_resume_sections'            => false,
+				'manage_resume_topics'            	=> false,
 				'manage_resume_organizations'       => false,
 				'edit_resume_sections'              => false,
+				'edit_resume_topics'              	=> false,
 				'edit_resume_organizations'         => false,
 				'delete_resume_sections'            => false,
+				'delete_resume_topics'            	=> false,
 				'delete_resume_organizations'       => false,
 				'assign_resume_sections'            => false,
+				'assign_resume_topics'            	=> false,
 				'assign_resume_organizations'       => false,
 				),
 		);
@@ -203,7 +224,11 @@ class WP_Resume_Admin {
 		//We use the same callback for both taxonomies and just pass the taxonomy type as an argument
 		add_meta_box( 'wp_resume_sectiondiv', __('Section', 'wp-resume'), array( &$this, 'taxonomy_box' ), 'wp_resume_position', 'side', 'low', array('type'=>'wp_resume_section') );
 
-		//same with orgs
+		//build our own topic taxonomy selector using radios rather than checkboxes
+		//We use the same callback for both taxonomies and just pass the taxonomy type as an argument
+		add_meta_box( 'wp_resume_topicdiv', __('Topic', 'wp-resume'), array( &$this, 'taxonomy_box' ), 'wp_resume_position', 'side', 'low', array('type'=>'wp_resume_topic') );
+
+		//same as section with orgs
 		add_meta_box( 'wp_resume_organizationdiv', __('Organization', 'wp-resume'), array( &$this, 'taxonomy_box' ), 'wp_resume_position', 'side', 'low', array('type'=>'wp_resume_organization') );
 
 		//build the date meta input box
