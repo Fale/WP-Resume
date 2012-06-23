@@ -229,6 +229,7 @@ class WP_Resume extends Plugin_Boilerplate_v_1 {
 		//Register organization taxonomy
 		register_taxonomy( 'wp_resume_organization', 'wp_resume_position', $args );
 
+		register_taxonomy_for_object_type('post_tag', 'wp_resume_position');
 	}
 
 	/**
