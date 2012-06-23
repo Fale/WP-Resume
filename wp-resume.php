@@ -212,7 +212,7 @@ class WP_Resume extends Plugin_Boilerplate_v_1 {
 		);
 
 		$args = $this->api->apply_filters( 'topic_ct', array( 
-			'hierarchical' => true, 
+			'hierarchical' => false, 
 			'labels' => $labels,  
 			'query_var' => true, 
 			'rewrite' => ( $rewrite ) ? array( 'slug' => 'topics' ) : false, 
